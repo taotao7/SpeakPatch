@@ -31,6 +31,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Rewrite Selected Text", action: #selector(rewriteSelected), keyEquivalent: "e"))
+        menu.addItem(NSMenuItem(title: "Grant Accessibility Permission", action: #selector(requestAccessibilityPermission), keyEquivalent: ""))
+        menu.addItem(NSMenuItem.separator())
 
         let toggle = NSMenuItem(title: "Show Toolbar on Selection", action: #selector(toggleAutoToolbar), keyEquivalent: "")
         toggle.state = AppSettings.shared.autoToolbarEnabled ? .on : .off
@@ -50,6 +52,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func toggleAutoToolbar(_ sender: NSMenuItem) {
         AppSettings.shared.autoToolbarEnabled.toggle()
         sender.state = AppSettings.shared.autoToolbarEnabled ? .on : .off
+        if AppSettings.shared.autoToolbarEnabled && !Accessibility.isTrusted {
+            _ = Accessibility.ensurePermission(prompt: true)
+        }
+    }
+
+    @objc private func requestAccessibilityPermission() {
+        _ = Accessibility.ensurePermission(prompt: true)
     }
 
     @objc private func openSettings() {

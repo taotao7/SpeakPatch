@@ -19,7 +19,6 @@ final class AppCoordinator: ObservableObject {
         hotKey.register(command: true, shift: true, keyCode: UInt32(kVK_ANSI_E)) { [weak self] in
             self?.captureAndShow()
         }
-        _ = Accessibility.ensurePermission(prompt: true)
 
         selectionMonitor.onSelection = { [weak self] text, location in
             NSLog("[SpeakPatch] selection detected: \(text.prefix(40))")
@@ -29,7 +28,7 @@ final class AppCoordinator: ObservableObject {
             self?.hideToolbar()
         }
         selectionMonitor.start()
-        NSLog("[SpeakPatch] started. Accessibility trusted = \(Accessibility.ensurePermission(prompt: false))")
+        NSLog("[SpeakPatch] started. Accessibility trusted = \(Accessibility.isTrusted)")
     }
 
     // MARK: - Selection toolbar (PopClip-style)

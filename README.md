@@ -32,6 +32,15 @@ System Settings > Privacy & Security > Accessibility > SpeakPatch
 
 SpeakPatch needs Accessibility access to detect selected text and to support the shortcut fallback that reads the current selection.
 
+If macOS keeps showing the permission dialog after you already enabled SpeakPatch, reset the stale permission entry and grant it again:
+
+```bash
+tccutil reset Accessibility com.speakpatch.app
+open /Applications/SpeakPatch.app
+```
+
+Then use the menu-bar item and choose `Grant Accessibility Permission`. Click `Open System Settings`, enable `SpeakPatch`, quit SpeakPatch, and reopen it.
+
 ## Provider Setup
 
 Open the menu-bar item, choose `Settings`, then configure an OpenAI-compatible provider.
@@ -75,8 +84,8 @@ open Package.swift
 Tagged releases are built by GitHub Actions.
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
 
 The release workflow builds `SpeakPatch.app`, uploads `SpeakPatch-<version>-macos.zip`, and updates `taotao7/homebrew-tap` with the cask checksum. The repository must have a `TAP_GITHUB_TOKEN` secret with permission to push to the tap.

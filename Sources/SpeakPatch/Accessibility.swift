@@ -1,6 +1,10 @@
 import AppKit
 
 struct Accessibility {
+    static var isTrusted: Bool {
+        ensurePermission(prompt: false)
+    }
+
     static func ensurePermission(prompt: Bool) -> Bool {
         let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: prompt]
         return AXIsProcessTrustedWithOptions(options)
