@@ -21,8 +21,7 @@ cask "speakpatch" do
   version "$VERSION"
   sha256 "$SHA256"
 
-  url "https://github.com/taotao7/SpeakPatch/releases/download/v#{version}/SpeakPatch-#{version}-macos.zip",
-      verified: "github.com/taotao7/SpeakPatch/"
+  url "https://github.com/taotao7/SpeakPatch/releases/download/v#{version}/SpeakPatch-#{version}-macos.zip"
   name "SpeakPatch"
   desc "Menu-bar assistant for rewriting selected text"
   homepage "https://github.com/taotao7/SpeakPatch"
