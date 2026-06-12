@@ -12,6 +12,8 @@ SpeakPatch is a lightweight macOS menu-bar assistant for improving selected text
 - PopClip-style toolbar after selecting text
 - Global shortcut: `Command + Shift + E`
 - Grammar correction as the default action
+- Terminal-friendly selected-text fallback for apps such as Ghostty
+- Floating panel closes with `Escape`, `Command + W`, or the close button
 - OpenAI-compatible provider settings
 - Editable system prompt with presets
 - Actions for grammar, natural phrasing, concise wording, translation, and explanations
@@ -41,6 +43,8 @@ open /Applications/SpeakPatch.app
 ```
 
 Then use the menu-bar item and choose `Grant Accessibility Permission`. Click `Open System Settings`, enable `SpeakPatch`, quit SpeakPatch, and reopen it.
+
+In terminal apps such as Ghostty, selected text may not be exposed through macOS Accessibility. SpeakPatch falls back to a temporary `Command + C` read for terminal-like apps, then restores your previous clipboard contents.
 
 ## Provider Setup
 
@@ -85,8 +89,8 @@ open Package.swift
 Tagged releases are built by GitHub Actions.
 
 ```bash
-git tag v0.1.2
-git push origin v0.1.2
+git tag v0.1.3
+git push origin v0.1.3
 ```
 
 The release workflow builds `SpeakPatch.app`, uploads `SpeakPatch-<version>-macos.zip`, and updates `taotao7/homebrew-tap` with the cask checksum. The repository must have a `TAP_GITHUB_TOKEN` secret with permission to push to the tap.

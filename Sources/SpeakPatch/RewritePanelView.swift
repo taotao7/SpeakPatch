@@ -45,6 +45,9 @@ struct RewritePanelView: View {
                 run(autoRunAction)
             }
         }
+        .onExitCommand {
+            NSApp.keyWindow?.close()
+        }
     }
 
     // MARK: - Header

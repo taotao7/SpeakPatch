@@ -27,6 +27,9 @@ final class AppCoordinator: ObservableObject {
         selectionMonitor.onEmpty = { [weak self] in
             self?.hideToolbar()
         }
+        selectionMonitor.shouldReadSelection = {
+            AppSettings.shared.autoToolbarEnabled && Accessibility.isTrusted
+        }
         selectionMonitor.start()
         NSLog("[SpeakPatch] started. Accessibility trusted = \(Accessibility.isTrusted)")
     }
@@ -148,7 +151,7 @@ final class FloatingPanel: NSPanel {
     init(contentRect: NSRect) {
         super.init(
             contentRect: contentRect,
-            styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel],
+            styleMask: [.titled, .closable, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -163,4 +166,35 @@ final class FloatingPanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
+
+    override func cancelOperation(_ sender: Any?) {
+        close()
+    }
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if shouldClose(for: event) {
+            close()
+            return true
+        }
+        return super.performKeyEquivalent(with: event)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        if shouldClose(for: event) {
+            close()
+            return
+        }
+        super.keyDown(with: event)
+    }
+
+    private func shouldClose(for event: NSEvent) -> Bool {
+        if event.keyCode == UInt16(kVK_Escape) {
+            return true
+        }
+        let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        let blockedModifiers: NSEvent.ModifierFlags = [.control, .option]
+        return modifiers.contains(.command) &&
+            modifiers.intersection(blockedModifiers).isEmpty &&
+            event.charactersIgnoringModifiers?.lowercased() == "w"
+    }
 }
