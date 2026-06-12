@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, without the leading v"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, release, and update tap
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          if [[ -z "$VERSION" ]]; then
+            echo "version is empty" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build release artifact
+        id: package
+        run: |
+          ./scripts/package-release.sh "${{ steps.version.outputs.version }}" | tee package-output.txt
+          ZIP_PATH="$(grep '^zip=' package-output.txt | cut -d= -f2-)"
+          CHECKSUM_PATH="$(grep '^checksum=' package-output.txt | cut -d= -f2-)"
+          SHA256="$(grep '^sha256=' package-output.txt | cut -d= -f2-)"
+          echo "zip_path=$ZIP_PATH" >> "$GITHUB_OUTPUT"
+          echo "checksum_path=$CHECKSUM_PATH" >> "$GITHUB_OUTPUT"
+          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            gh release upload "${{ steps.version.outputs.tag }}" \
+              "${{ steps.package.outputs.zip_path }}" \
+              "${{ steps.package.outputs.checksum_path }}" \
+              --clobber
+          else
+            gh release create "${{ steps.version.outputs.tag }}" \
+              "${{ steps.package.outputs.zip_path }}" \
+              "${{ steps.package.outputs.checksum_path }}" \
+              --title "SpeakPatch ${{ steps.version.outputs.version }}" \
+              --notes "Install with: brew install --cask taotao7/tap/speakpatch"
+          fi
+
+      - name: Update Homebrew tap
+        env:
+          TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          if [[ -z "$TAP_GITHUB_TOKEN" ]]; then
+            echo "Missing TAP_GITHUB_TOKEN secret; cannot update taotao7/homebrew-tap." >&2
+            exit 1
+          fi
+
+          git clone "https://x-access-token:${TAP_GITHUB_TOKEN}@github.com/taotao7/homebrew-tap.git" homebrew-tap
+          ./scripts/update-tap-cask.sh homebrew-tap "${{ steps.version.outputs.version }}" "${{ steps.package.outputs.sha256 }}"
+
+          git -C homebrew-tap config user.name "github-actions[bot]"
+          git -C homebrew-tap config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C homebrew-tap add Casks/speakpatch.rb
+          if git -C homebrew-tap diff --cached --quiet; then
+            echo "Tap already up to date."
+          else
+            git -C homebrew-tap commit -m "Update SpeakPatch to ${{ steps.version.outputs.version }}"
+            git -C homebrew-tap push
+          fi

@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          swift --version
+          xcodebuild -version
+
+      - name: Build Swift package
+        run: swift build -c release
+
+      - name: Build app bundle
+        run: ./scripts/build-app.sh release
+
+      - name: Validate app bundle
+        run: |
+          test -x SpeakPatch.app/Contents/MacOS/SpeakPatch
+          test -f SpeakPatch.app/Contents/Resources/AppIcon.icns
+          plutil -lint SpeakPatch.app/Contents/Info.plist
+          codesign --verify --strict --verbose=2 SpeakPatch.app
