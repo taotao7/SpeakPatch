@@ -64,7 +64,7 @@ struct LLMClient {
         let requestBody = ChatCompletionRequest(
             model: settings.model,
             messages: [
-                .init(role: "system", content: settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? PromptPreset.speakingCoach.systemPrompt : settings.systemPrompt),
+                .init(role: "system", content: settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? PromptPreset.grammarOnly.systemPrompt : settings.systemPrompt),
                 .init(role: "user", content: "Task: \(action.instruction)\n\nText:\n\(text)")
             ],
             temperature: settings.temperature

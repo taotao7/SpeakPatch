@@ -5,7 +5,7 @@ struct RewritePanelView: View {
     @EnvironmentObject var settings: AppSettings
     @State private var inputText: String
     @State private var outputText: String = ""
-    @State private var selectedAction: RewriteAction = .natural
+    @State private var selectedAction: RewriteAction = .fixGrammar
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var didCopy = false

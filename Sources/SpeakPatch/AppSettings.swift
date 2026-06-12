@@ -30,8 +30,26 @@ final class AppSettings: ObservableObject {
         path = UserDefaults.standard.string(forKey: Keys.path) ?? "/v1/chat/completions"
         let savedTemperature = UserDefaults.standard.object(forKey: Keys.temperature) as? Double
         temperature = savedTemperature ?? 0.2
-        selectedPreset = UserDefaults.standard.string(forKey: Keys.selectedPreset) ?? PromptPreset.speakingCoach.rawValue
-        systemPrompt = UserDefaults.standard.string(forKey: Keys.systemPrompt) ?? PromptPreset.speakingCoach.systemPrompt
+        let savedPreset = UserDefaults.standard.string(forKey: Keys.selectedPreset)
+        let savedSystemPrompt = UserDefaults.standard.string(forKey: Keys.systemPrompt)
+        if savedPreset == PromptPreset.speakingCoach.rawValue &&
+            (savedSystemPrompt == nil || savedSystemPrompt == PromptPreset.speakingCoach.systemPrompt) {
+            selectedPreset = PromptPreset.grammarOnly.rawValue
+            systemPrompt = PromptPreset.grammarOnly.systemPrompt
+            UserDefaults.standard.set(PromptPreset.grammarOnly.rawValue, forKey: Keys.selectedPreset)
+            UserDefaults.standard.set(PromptPreset.grammarOnly.systemPrompt, forKey: Keys.systemPrompt)
+        } else {
+            let initialPreset = savedPreset ?? PromptPreset.grammarOnly.rawValue
+            let initialSystemPrompt = savedSystemPrompt ?? PromptPreset.grammarOnly.systemPrompt
+            selectedPreset = initialPreset
+            systemPrompt = initialSystemPrompt
+            if savedPreset == nil {
+                UserDefaults.standard.set(initialPreset, forKey: Keys.selectedPreset)
+            }
+            if savedSystemPrompt == nil {
+                UserDefaults.standard.set(initialSystemPrompt, forKey: Keys.systemPrompt)
+            }
+        }
         let savedAutoToolbar = UserDefaults.standard.object(forKey: Keys.autoToolbarEnabled) as? Bool
         autoToolbarEnabled = savedAutoToolbar ?? true
     }

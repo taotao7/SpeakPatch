@@ -4,13 +4,14 @@
   <img src="Resources/AppIcon.png" alt="SpeakPatch icon" width="128" height="128">
 </p>
 
-SpeakPatch is a lightweight macOS menu-bar assistant for improving selected text. Select text in any app, use the quick toolbar or press `Command + Shift + E`, and rewrite it through any OpenAI-compatible chat completions endpoint.
+SpeakPatch is a lightweight macOS menu-bar assistant for improving selected text. Select text in any app, use the quick toolbar or press `Command + Shift + E`, and fix grammar through any OpenAI-compatible chat completions endpoint.
 
 ## Features
 
 - Native SwiftUI macOS menu-bar app
 - PopClip-style toolbar after selecting text
 - Global shortcut: `Command + Shift + E`
+- Grammar correction as the default action
 - OpenAI-compatible provider settings
 - Editable system prompt with presets
 - Actions for grammar, natural phrasing, concise wording, translation, and explanations
@@ -84,8 +85,8 @@ open Package.swift
 Tagged releases are built by GitHub Actions.
 
 ```bash
-git tag v0.1.1
-git push origin v0.1.1
+git tag v0.1.2
+git push origin v0.1.2
 ```
 
 The release workflow builds `SpeakPatch.app`, uploads `SpeakPatch-<version>-macos.zip`, and updates `taotao7/homebrew-tap` with the cask checksum. The repository must have a `TAP_GITHUB_TOKEN` secret with permission to push to the tap.

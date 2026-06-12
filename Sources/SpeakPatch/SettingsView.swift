@@ -70,10 +70,10 @@ struct SettingsView: View {
                     }
                     Spacer()
                     Button {
-                        settings.selectedPreset = PromptPreset.speakingCoach.rawValue
-                        settings.systemPrompt = PromptPreset.speakingCoach.systemPrompt
+                        settings.selectedPreset = PromptPreset.grammarOnly.rawValue
+                        settings.systemPrompt = PromptPreset.grammarOnly.systemPrompt
                     } label: {
-                        Label("Use Speaking Coach", systemImage: "sparkles")
+                        Label("Use Grammar Only", systemImage: "checkmark.circle")
                     }
                 }
             } header: {

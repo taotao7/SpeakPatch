@@ -40,7 +40,7 @@ final class AppCoordinator: ObservableObject {
     }
 
     func showToolbar(at location: NSPoint) {
-        let actions: [RewriteAction] = [.natural, .fixGrammar, .translate]
+        let actions: [RewriteAction] = [.fixGrammar, .natural, .translate]
         let view = SelectionToolbarView(
             actions: actions,
             onAction: { [weak self] action in
@@ -107,7 +107,7 @@ final class AppCoordinator: ObservableObject {
         Task { @MainActor in
             let selected = selectionReader.readSelectedTextViaClipboard()
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-            showPanel(selectedText: selected, autoRun: selected.isEmpty ? nil : .natural)
+            showPanel(selectedText: selected, autoRun: selected.isEmpty ? nil : .fixGrammar)
         }
     }
 
