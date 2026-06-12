@@ -85,6 +85,11 @@ struct SettingsView: View {
                 Text("Requires Accessibility permission. Reads selected text via the Accessibility API without touching your clipboard.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+
+                Toggle("Show quick toolbar for terminal clipboard changes", isOn: $settings.terminalClipboardToolbarEnabled)
+                Text("Only runs while a terminal app is frontmost, after a short debounce, and ignores paths, URLs, code-like blocks, large JSON, and token-like text.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             } header: {
                 Text("Behavior")
             }

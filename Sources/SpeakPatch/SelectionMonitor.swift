@@ -12,7 +12,6 @@ final class SelectionMonitor {
     var shouldReadSelection: () -> Bool = { true }
 
     private var monitor: Any?
-    private let selectionReader = SelectionReader()
 
     func start() {
         guard monitor == nil else { return }
@@ -37,35 +36,9 @@ final class SelectionMonitor {
             }
             if let text = Accessibility.selectedText() {
                 self.onSelection?(text, location)
-            } else if self.shouldUseClipboardFallback(),
-                      let text = self.clipboardFallbackText() {
-                self.onSelection?(text, location)
             } else {
                 self.onEmpty?()
             }
         }
-    }
-
-    private func clipboardFallbackText() -> String? {
-        let text = selectionReader
-            .readSelectedTextViaClipboard(promptForPermission: false)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return text.isEmpty ? nil : text
-    }
-
-    private func shouldUseClipboardFallback() -> Bool {
-        guard let app = NSWorkspace.shared.frontmostApplication else { return false }
-        let bundleID = app.bundleIdentifier?.lowercased() ?? ""
-        let appName = app.localizedName?.lowercased() ?? ""
-        let terminalHints = [
-            "ghostty",
-            "terminal",
-            "iterm",
-            "wezterm",
-            "alacritty",
-            "kitty",
-            "warp"
-        ]
-        return terminalHints.contains { bundleID.contains($0) || appName.contains($0) }
     }
 }

@@ -8,6 +8,7 @@ final class AppCoordinator: ObservableObject {
     private let hotKey = HotKeyManager()
     private let selectionReader = SelectionReader()
     private let selectionMonitor = SelectionMonitor()
+    private let clipboardMonitor = ClipboardMonitor()
 
     private var panel: NSPanel?
     private var toolbarPanel: SelectionToolbarPanel?
@@ -22,7 +23,7 @@ final class AppCoordinator: ObservableObject {
 
         selectionMonitor.onSelection = { [weak self] text, location in
             NSLog("[SpeakPatch] selection detected: \(text.prefix(40))")
-            self?.handleSelection(text: text, at: location)
+            self?.handleSelection(text: text, at: location, mode: .selection)
         }
         selectionMonitor.onEmpty = { [weak self] in
             self?.hideToolbar()
@@ -31,14 +32,28 @@ final class AppCoordinator: ObservableObject {
             AppSettings.shared.autoToolbarEnabled && Accessibility.isTrusted
         }
         selectionMonitor.start()
+
+        clipboardMonitor.onText = { [weak self] text, location in
+            NSLog("[SpeakPatch] terminal clipboard detected: \(text.prefix(40))")
+            self?.handleSelection(text: text, at: location, mode: .terminalClipboard)
+        }
+        clipboardMonitor.shouldMonitor = {
+            AppSettings.shared.autoToolbarEnabled &&
+                AppSettings.shared.terminalClipboardToolbarEnabled
+        }
+        clipboardMonitor.start()
         NSLog("[SpeakPatch] started. Accessibility trusted = \(Accessibility.isTrusted)")
     }
 
     // MARK: - Selection toolbar (PopClip-style)
 
-    private func handleSelection(text: String, at location: NSPoint) {
+    private func handleSelection(text: String, at location: NSPoint, mode: SelectionTriggerMode) {
         guard AppSettings.shared.autoToolbarEnabled else { return }
-        lastSelectedText = text
+        guard let cleaned = SelectionCandidateFilter.cleanedText(from: text, mode: mode) else {
+            hideToolbar()
+            return
+        }
+        lastSelectedText = cleaned
         showToolbar(at: location)
     }
 
@@ -107,6 +122,7 @@ final class AppCoordinator: ObservableObject {
 
     func captureAndShow() {
         hideToolbar()
+        clipboardMonitor.suppress(for: 1.0)
         Task { @MainActor in
             let selected = selectionReader.readSelectedTextViaClipboard()
                 .trimmingCharacters(in: .whitespacesAndNewlines)

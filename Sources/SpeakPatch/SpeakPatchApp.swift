@@ -14,7 +14,7 @@ struct SpeakPatchApp: App {
     }
 }
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem?
     private let coordinator = AppCoordinator.shared
 
@@ -38,11 +38,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         toggle.state = AppSettings.shared.autoToolbarEnabled ? .on : .off
         menu.addItem(toggle)
 
+        let terminalToggle = NSMenuItem(title: "Show Toolbar for Terminal Clipboard", action: #selector(toggleTerminalClipboardToolbar), keyEquivalent: "")
+        terminalToggle.state = AppSettings.shared.terminalClipboardToolbarEnabled ? .on : .off
+        menu.addItem(terminalToggle)
+
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Settings", action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q"))
+        menu.delegate = self
         item.menu = menu
         statusItem = item
+    }
+
+    func menuWillOpen(_ menu: NSMenu) {
+        for item in menu.items {
+            if item.action == #selector(toggleAutoToolbar(_:)) {
+                item.state = AppSettings.shared.autoToolbarEnabled ? .on : .off
+            } else if item.action == #selector(toggleTerminalClipboardToolbar(_:)) {
+                item.state = AppSettings.shared.terminalClipboardToolbarEnabled ? .on : .off
+            }
+        }
     }
 
     @objc private func rewriteSelected() {
@@ -55,6 +70,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if AppSettings.shared.autoToolbarEnabled && !Accessibility.isTrusted {
             _ = Accessibility.ensurePermission(prompt: true)
         }
+    }
+
+    @objc private func toggleTerminalClipboardToolbar(_ sender: NSMenuItem) {
+        AppSettings.shared.terminalClipboardToolbarEnabled.toggle()
+        sender.state = AppSettings.shared.terminalClipboardToolbarEnabled ? .on : .off
     }
 
     @objc private func requestAccessibilityPermission() {

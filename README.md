@@ -12,7 +12,7 @@ SpeakPatch is a lightweight macOS menu-bar assistant for improving selected text
 - PopClip-style toolbar after selecting text
 - Global shortcut: `Command + Shift + E`
 - Grammar correction as the default action
-- Terminal-friendly selected-text fallback for apps such as Ghostty
+- Terminal-friendly clipboard trigger for apps such as Ghostty, iTerm, Terminal, and WezTerm
 - Floating panel closes with `Escape`, `Command + W`, or the close button
 - OpenAI-compatible provider settings
 - Editable system prompt with presets
@@ -44,7 +44,7 @@ open /Applications/SpeakPatch.app
 
 Then use the menu-bar item and choose `Grant Accessibility Permission`. Click `Open System Settings`, enable `SpeakPatch`, quit SpeakPatch, and reopen it.
 
-In terminal apps such as Ghostty, selected text may not be exposed through macOS Accessibility. SpeakPatch falls back to a temporary `Command + C` read for terminal-like apps, then restores your previous clipboard contents.
+In terminal apps such as Ghostty, selected text may not be exposed through macOS Accessibility. SpeakPatch watches clipboard changes only while a terminal app is frontmost, debounces them, and ignores noisy values such as paths, URLs, code-like blocks, large JSON, and token-like text. The global shortcut still performs a temporary `Command + C` read and restores your previous clipboard contents.
 
 ## Provider Setup
 

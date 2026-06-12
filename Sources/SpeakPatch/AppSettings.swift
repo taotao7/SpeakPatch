@@ -11,6 +11,7 @@ final class AppSettings: ObservableObject {
     @Published var systemPrompt: String { didSet { UserDefaults.standard.set(systemPrompt, forKey: Keys.systemPrompt) } }
     @Published var selectedPreset: String { didSet { UserDefaults.standard.set(selectedPreset, forKey: Keys.selectedPreset) } }
     @Published var autoToolbarEnabled: Bool { didSet { UserDefaults.standard.set(autoToolbarEnabled, forKey: Keys.autoToolbarEnabled) } }
+    @Published var terminalClipboardToolbarEnabled: Bool { didSet { UserDefaults.standard.set(terminalClipboardToolbarEnabled, forKey: Keys.terminalClipboardToolbarEnabled) } }
 
     private enum Keys {
         static let baseURL = "provider.baseURL"
@@ -21,6 +22,7 @@ final class AppSettings: ObservableObject {
         static let systemPrompt = "prompt.systemPrompt"
         static let selectedPreset = "prompt.selectedPreset"
         static let autoToolbarEnabled = "behavior.autoToolbarEnabled"
+        static let terminalClipboardToolbarEnabled = "behavior.terminalClipboardToolbarEnabled"
     }
 
     private init() {
@@ -52,5 +54,7 @@ final class AppSettings: ObservableObject {
         }
         let savedAutoToolbar = UserDefaults.standard.object(forKey: Keys.autoToolbarEnabled) as? Bool
         autoToolbarEnabled = savedAutoToolbar ?? true
+        let savedTerminalClipboardToolbar = UserDefaults.standard.object(forKey: Keys.terminalClipboardToolbarEnabled) as? Bool
+        terminalClipboardToolbarEnabled = savedTerminalClipboardToolbar ?? true
     }
 }
