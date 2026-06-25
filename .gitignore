@@ -7,3 +7,4 @@ SpeakPatch.app/
 Resources/AppIcon.iconset/
 *.xcuserstate
 *.xcuserdata/
+.superpowers/
