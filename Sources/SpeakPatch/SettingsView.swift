@@ -165,7 +165,7 @@ private struct BeigeButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(Theme.text)
+            .foregroundStyle(Theme.accent)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(
