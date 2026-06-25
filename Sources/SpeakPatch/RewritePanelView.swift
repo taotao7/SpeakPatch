@@ -104,7 +104,7 @@ struct RewritePanelView: View {
                         .frame(maxWidth: .infinity)
                         .overlay(alignment: .bottom) {
                             Rectangle()
-                                .fill(Theme.accent)
+                                .fill(isDisabled ? Theme.accent.opacity(0.5) : Theme.accent)
                                 .frame(height: selectedAction == action ? 2 : 0)
                         }
                 }
@@ -185,6 +185,7 @@ struct RewritePanelView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(outputText.isEmpty ? Theme.textMuted.opacity(0.5) : Theme.accent)
             }
+            .buttonStyle(.plain)
             .disabled(outputText.isEmpty)
 
             Button {
@@ -194,6 +195,7 @@ struct RewritePanelView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(outputText.isEmpty ? Theme.textMuted.opacity(0.5) : Theme.textMuted)
             }
+            .buttonStyle(.plain)
             .disabled(outputText.isEmpty)
 
             Spacer()

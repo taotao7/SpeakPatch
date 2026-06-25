@@ -18,8 +18,9 @@ struct SelectionToolbarView: View {
                 }
             }
 
-            Divider()
-                .frame(height: 24)
+            Rectangle()
+                .fill(Theme.border)
+                .frame(width: 1, height: 24)
                 .padding(.horizontal, 2)
 
             button(symbol: "ellipsis", title: "More") {
@@ -55,14 +56,17 @@ struct SelectionToolbarView: View {
 }
 
 private struct ToolbarButtonStyle: ButtonStyle {
+    @State private var isHovered = false
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .foregroundStyle(Theme.text)
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(configuration.isPressed ? Theme.hover : Color.clear)
+                    .fill((configuration.isPressed || isHovered) ? Theme.hover : Color.clear)
             )
             .contentShape(Rectangle())
+            .onHover { isHovered = $0 }
     }
 }
 
