@@ -22,7 +22,7 @@ struct RewritePanelView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             header
             actionBar
 
@@ -30,15 +30,15 @@ struct RewritePanelView: View {
                 title: "Input",
                 text: $inputText,
                 placeholder: "Type or paste the text you want to improve…",
-                minHeight: 96
+                minHeight: 72
             )
 
             resultSection
             footer
         }
-        .padding(20)
-        .frame(width: 600, height: 540)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .padding(16)
+        .frame(width: 480, height: 380)
+        .background(Theme.background)
         .onAppear {
             if let autoRunAction {
                 selectedAction = autoRunAction
@@ -53,19 +53,14 @@ struct RewritePanelView: View {
     // MARK: - Header
 
     private var header: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "wand.and.stars")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(Color.accentColor)
-                .frame(width: 32, height: 32)
-                .background(Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 1) {
+        HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text("SpeakPatch")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.text)
                 Text(settings.selectedPreset)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 10))
+                    .foregroundStyle(Theme.textMuted)
             }
 
             Spacer()
@@ -74,18 +69,18 @@ struct RewritePanelView: View {
                 openSettings()
             } label: {
                 Image(systemName: "gearshape")
+                    .font(.system(size: 13, weight: .medium))
             }
-            .buttonStyle(.borderless)
-            .controlSize(.large)
+            .buttonStyle(PanelIconButtonStyle())
             .help("Settings")
 
             Button {
                 NSApp.keyWindow?.close()
             } label: {
                 Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .medium))
             }
-            .buttonStyle(.borderless)
-            .controlSize(.large)
+            .buttonStyle(PanelIconButtonStyle())
             .help("Close")
         }
     }
@@ -93,26 +88,26 @@ struct RewritePanelView: View {
     // MARK: - Action bar
 
     private var actionBar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             ForEach(RewriteAction.allCases) { action in
                 Button {
                     selectedAction = action
                     run(action)
                 } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: action.symbol)
-                            .font(.system(size: 11, weight: .medium))
-                        Text(action.shortTitle)
-                            .font(.system(size: 12, weight: .medium))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.85)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 5)
+                    Text(action.shortTitle)
+                        .font(.system(size: 11, weight: selectedAction == action ? .semibold : .medium))
+                        .foregroundStyle(selectedAction == action ? Theme.accent : Theme.textMuted)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity)
+                        .overlay(alignment: .bottom) {
+                            Rectangle()
+                                .fill(Theme.accent)
+                                .frame(height: selectedAction == action ? 2 : 0)
+                        }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(selectedAction == action ? Color.accentColor : Color(nsColor: .controlColor))
-                .foregroundStyle(selectedAction == action ? Color.white : Color.primary)
+                .buttonStyle(.plain)
                 .disabled(inputIsEmpty || isLoading)
                 .help(action.rawValue)
             }
@@ -122,30 +117,31 @@ struct RewritePanelView: View {
     // MARK: - Result
 
     private var resultSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 Text("Result")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.textMuted)
                 if isLoading {
                     ProgressView()
                         .controlSize(.small)
+                        .scaleEffect(0.7)
                     Text("Rewriting…")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 10))
+                        .foregroundStyle(Theme.textMuted)
                 }
                 Spacer()
             }
 
             ZStack(alignment: .topLeading) {
-                cardEditor(text: $outputText, minHeight: 130)
+                cardEditor(text: $outputText, minHeight: 88)
 
                 if outputText.isEmpty && !isLoading {
                     Text("Your rewritten text will appear here.")
-                        .font(.system(size: 13))
-                        .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 11)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.textPlaceholder)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
                         .allowsHitTesting(false)
                 }
             }
@@ -157,63 +153,66 @@ struct RewritePanelView: View {
     }
 
     private func errorBanner(_ message: String) -> some View {
-        HStack(alignment: .top, spacing: 7) {
+        HStack(alignment: .top, spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 12))
+                .font(.system(size: 11))
             Text(message)
-                .font(.footnote)
+                .font(.system(size: 11))
             Spacer(minLength: 0)
         }
-        .foregroundStyle(Color.red)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(Color.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .foregroundStyle(Theme.error)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(Theme.errorBackground, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
     // MARK: - Footer
 
     private var footer: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 12) {
             Button {
                 copy(outputText)
             } label: {
-                Label(didCopy ? "Copied" : "Copy result", systemImage: didCopy ? "checkmark" : "doc.on.doc")
+                Text(didCopy ? "Copied" : "Copy")
+                    .font(.system(size: 12, weight: .medium))
             }
             .disabled(outputText.isEmpty)
+            .foregroundStyle(outputText.isEmpty ? Theme.textMuted : Theme.accent)
 
             Button {
                 inputText = outputText
             } label: {
-                Label("Replace input", systemImage: "arrow.up.to.line")
+                Text("Replace")
+                    .font(.system(size: 12, weight: .medium))
             }
             .disabled(outputText.isEmpty)
+            .foregroundStyle(outputText.isEmpty ? Theme.textMuted : Theme.textMuted)
 
             Spacer()
 
-            Label("⌘⇧E", systemImage: "keyboard")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            Text("⌘⇧E")
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(Theme.textMuted)
         }
-        .controlSize(.large)
     }
 
     // MARK: - Editors
 
     private func editor(title: String, text: Binding<String>, placeholder: String, minHeight: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Theme.textMuted)
 
             ZStack(alignment: .topLeading) {
                 cardEditor(text: text, minHeight: minHeight)
 
                 if text.wrappedValue.isEmpty {
                     Text(placeholder)
-                        .font(.system(size: 13))
-                        .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 11)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.textPlaceholder)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
                         .allowsHitTesting(false)
                 }
             }
@@ -222,17 +221,32 @@ struct RewritePanelView: View {
 
     private func cardEditor(text: Binding<String>, minHeight: CGFloat) -> some View {
         TextEditor(text: text)
-            .font(.system(size: 13))
+            .font(.system(size: 12))
             .scrollContentBackground(.hidden)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
             .frame(minHeight: minHeight)
-            .background(Color(nsColor: .textBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .foregroundStyle(Theme.text)
+            .background(Theme.elevatedSurface)
+            .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .strokeBorder(Color(nsColor: .separatorColor), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .strokeBorder(Theme.border, lineWidth: 1)
             )
+    }
+
+    // MARK: - Button styles
+
+    private struct PanelIconButtonStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .foregroundStyle(Theme.textMuted)
+                .frame(width: 24, height: 24)
+                .background(
+                    configuration.isPressed ? Theme.hover : Color.clear,
+                    in: RoundedRectangle(cornerRadius: 5, style: .continuous)
+                )
+        }
     }
 
     // MARK: - Actions
