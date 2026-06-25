@@ -160,6 +160,8 @@ private extension View {
 }
 
 private struct BeigeButtonStyle: ButtonStyle {
+    @State private var isHovered = false
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 12, weight: .medium))
@@ -167,12 +169,13 @@ private struct BeigeButtonStyle: ButtonStyle {
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(
-                configuration.isPressed ? Theme.hover : Theme.elevatedSurface,
+                (configuration.isPressed || isHovered) ? Theme.hover : Theme.elevatedSurface,
                 in: RoundedRectangle(cornerRadius: 6, style: .continuous)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
                     .strokeBorder(Theme.border, lineWidth: 1)
             )
+            .onHover { isHovered = $0 }
     }
 }

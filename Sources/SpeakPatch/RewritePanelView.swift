@@ -37,7 +37,7 @@ struct RewritePanelView: View {
             footer
         }
         .padding(16)
-        .frame(width: 480, height: 380)
+        .frame(width: Theme.panelSize.width, height: Theme.panelSize.height)
         .background(Theme.background)
         .onAppear {
             if let autoRunAction {
@@ -88,7 +88,8 @@ struct RewritePanelView: View {
     // MARK: - Action bar
 
     private var actionBar: some View {
-        HStack(spacing: 0) {
+        let isDisabled = inputIsEmpty || isLoading
+        return HStack(spacing: 0) {
             ForEach(RewriteAction.allCases) { action in
                 Button {
                     selectedAction = action
@@ -96,7 +97,7 @@ struct RewritePanelView: View {
                 } label: {
                     Text(action.shortTitle)
                         .font(.system(size: 11, weight: selectedAction == action ? .semibold : .medium))
-                        .foregroundStyle(selectedAction == action ? Theme.accent : Theme.textMuted)
+                        .foregroundStyle(actionTabForeground(isSelected: selectedAction == action, isDisabled: isDisabled))
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
                         .padding(.vertical, 6)
@@ -108,10 +109,17 @@ struct RewritePanelView: View {
                         }
                 }
                 .buttonStyle(.plain)
-                .disabled(inputIsEmpty || isLoading)
+                .disabled(isDisabled)
                 .help(action.rawValue)
             }
         }
+    }
+
+    private func actionTabForeground(isSelected: Bool, isDisabled: Bool) -> Color {
+        if isDisabled {
+            return Theme.textMuted.opacity(0.5)
+        }
+        return isSelected ? Theme.accent : Theme.textMuted
     }
 
     // MARK: - Result
@@ -175,18 +183,18 @@ struct RewritePanelView: View {
             } label: {
                 Text(didCopy ? "Copied" : "Copy")
                     .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(outputText.isEmpty ? Theme.textMuted.opacity(0.5) : Theme.accent)
             }
             .disabled(outputText.isEmpty)
-            .foregroundStyle(outputText.isEmpty ? Theme.textMuted : Theme.accent)
 
             Button {
                 inputText = outputText
             } label: {
                 Text("Replace")
                     .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(outputText.isEmpty ? Theme.textMuted.opacity(0.5) : Theme.textMuted)
             }
             .disabled(outputText.isEmpty)
-            .foregroundStyle(outputText.isEmpty ? Theme.textMuted : Theme.textMuted)
 
             Spacer()
 
@@ -238,14 +246,17 @@ struct RewritePanelView: View {
     // MARK: - Button styles
 
     private struct PanelIconButtonStyle: ButtonStyle {
+        @State private var isHovered = false
+
         func makeBody(configuration: Configuration) -> some View {
             configuration.label
                 .foregroundStyle(Theme.textMuted)
                 .frame(width: 24, height: 24)
                 .background(
-                    configuration.isPressed ? Theme.hover : Color.clear,
+                    (configuration.isPressed || isHovered) ? Theme.hover : Color.clear,
                     in: RoundedRectangle(cornerRadius: 5, style: .continuous)
                 )
+                .onHover { isHovered = $0 }
         }
     }
 

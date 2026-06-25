@@ -32,7 +32,7 @@ struct SelectionToolbarView: View {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(Theme.border, lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.12), radius: 10, y: 4)
+        .shadow(color: Theme.text.opacity(0.12), radius: 10, y: 4)
         .padding(8) // room for the shadow inside the hosting view
         .fixedSize()
     }
