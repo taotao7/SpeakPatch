@@ -19,34 +19,34 @@ struct SelectionToolbarView: View {
             }
 
             Divider()
-                .frame(height: 26)
+                .frame(height: 24)
                 .padding(.horizontal, 2)
 
             button(symbol: "ellipsis", title: "More") {
                 onOpen()
             }
         }
-        .padding(5)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .padding(4)
+        .background(Theme.background, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .stroke(.black.opacity(0.08), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Theme.border, lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.22), radius: 10, y: 4)
+        .shadow(color: Color.black.opacity(0.12), radius: 10, y: 4)
         .padding(8) // room for the shadow inside the hosting view
         .fixedSize()
     }
 
     private func button(symbol: String, title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 3) {
+            VStack(spacing: 2) {
                 Image(systemName: symbol)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 14, weight: .medium))
                 Text(title)
-                    .font(.system(size: 10))
+                    .font(.system(size: 9))
             }
-            .frame(minWidth: 48)
-            .padding(.vertical, 6)
+            .frame(minWidth: 44)
+            .padding(.vertical, 5)
             .padding(.horizontal, 4)
             .contentShape(Rectangle())
         }
@@ -57,10 +57,10 @@ struct SelectionToolbarView: View {
 private struct ToolbarButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundStyle(.primary)
+            .foregroundStyle(Theme.text)
             .background(
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(configuration.isPressed ? Color.accentColor.opacity(0.25) : Color.clear)
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(configuration.isPressed ? Theme.hover : Color.clear)
             )
             .contentShape(Rectangle())
     }
