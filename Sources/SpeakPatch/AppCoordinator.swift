@@ -137,7 +137,7 @@ final class AppCoordinator: ObservableObject {
         let hosting = NSHostingView(rootView: view)
 
         if panel == nil {
-            let newPanel = FloatingPanel(contentRect: NSRect(x: 0, y: 0, width: 560, height: 460))
+            let newPanel = FloatingPanel(contentRect: NSRect(x: 0, y: 0, width: 480, height: 380))
             newPanel.contentView = hosting
             panel = newPanel
         } else {
